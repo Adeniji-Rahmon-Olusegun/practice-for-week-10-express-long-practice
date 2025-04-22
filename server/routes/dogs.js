@@ -28,6 +28,7 @@ const validateDogInfo = (req, res, next) => {
   }
   next();
 };
+
 const validateDogId = (req, res, next) => {
   const { dogId } = req.params;
   const dog = dogs.find(dog => dog.dogId == dogId);
@@ -48,36 +49,46 @@ const getAllDogs = (req, res) => {
 };
 
 // GET /dogs/:dogId
-const getDogById = (req, res) => {
+const getDogById = (req, res, next) => {
+  
   const { dogId } = req.params;
   const dog = dogs.find(dog => dog.dogId == dogId);
+
+  //if (!dog) validateDogId(req, res, next);
   res.json(dog);
 }
 
 // POST /dogs
 const createDog = (req, res) => {
+  
   const { name } = req.body;
   const newDog = {
     dogId: getNewDogId(),
     name
-  };
+  }
+
   dogs.push(newDog);
   res.json(newDog);
 };
 
 // PUT /dogs/:dogId
-const updateDog = (req, res) => {
+const updateDog = (req, res, next) => {
+  
   const { name } = req.body;
   const { dogId } = req.params;
   const dog = dogs.find(dog => dog.dogId == dogId);
+  
+  //if (!dog) validateDogId(req, res, next);
   dog.name = name;
   res.json(dog);
 };
 
 // DELETE /dogs/:dogId
-const deleteDog = (req, res) => {
+const deleteDog = (req, res, next) => {
   const { dogId } = req.params;
   const dogIdx = dogs.findIndex(dog => dog.dogId == dogId);
+
+  //if (!dogs) validateDogId(req, res, next)
   dogs.splice(dogIdx, 1);
   res.json({ message: "success" });
 };
@@ -85,3 +96,20 @@ const deleteDog = (req, res) => {
 // ------------------------------  ROUTER ------------------------------  
 
 // Your code here
+const express = require('express');
+
+const router = express.Router();
+const foodRouter = require('./dog-foods');
+
+router.use('/:dogId', validateDogId);
+
+
+router.get('/', getAllDogs);
+router.get('/:dogId', getDogById);
+router.post('/', validateDogInfo, createDog);
+router.put('/:dogId', updateDog);
+router.delete('/:dogId', deleteDog);
+
+router.use('/:dogId/foods', foodRouter);
+
+module.exports = router;

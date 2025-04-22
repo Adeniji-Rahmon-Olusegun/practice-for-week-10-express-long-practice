@@ -53,6 +53,7 @@ const createFood = (req, res) => {
     name,
     dogId
   };
+
   foods.push(newFood);
   res.json(newFood);
 };
@@ -60,3 +61,10 @@ const createFood = (req, res) => {
 // ------------------------------  ROUTER ------------------------------  
 
 // Your code here
+const express = require('express');
+const foodRouter = express.Router({ mergeParams: true });
+
+foodRouter.get('/', getFoodsByDogId);
+foodRouter.post('/', validateFoodInfo, createFood);
+
+module.exports = foodRouter;
